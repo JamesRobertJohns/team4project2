@@ -29,4 +29,15 @@ int main() {
 	b.print();
 	cout << "number of vertex " << b.getNumVertex() << endl;
 	cout << "number of edges " << b.getNumEdge() << endl;
+
+	PriorityQ_Array pqa{};
+	pqa.print();
+	pqa.insert(make_pair(1, 10));
+	pqa.insert(make_pair(2, 5));
+	pqa.insert(make_pair(3, 20));
+	pqa.insert(make_pair(4, 1));
+	pqa.insert(make_pair(5, 15));
+	pqa.print();	
+	pqa.decreaseKey(3, 2);
+	pqa.print();
 }
