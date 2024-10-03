@@ -15,13 +15,15 @@ class Graph {
 
 class Graph_List : public Graph {
 	public:
-		Graph_List(int v, int e) : Graph(v, e), adjList(v) {}
+		Graph_List(int v, int e, vector<vector<pair<int,int>>>& L) : Graph{v, e}, adjList{ L } {}
 		Graph_List() : Graph(0, 0), adjList(0) {}
 
 		void setNumVertex(int v) { numVertex = v; adjList.resize(v); }
 		void addEdge(int src, int dst, int w) {
-			if (w < 0) { cout << "weight must be positive" << endl; return; }
-			if (src < 0 || src > numVertex || dst < 0 || dst > numVertex) { cout << "index out of bound" << endl; return; }
+			if (w < 0) { throw invalid_argument{ "weight must be positive" }; }
+			if (src < 0 || src > numVertex || dst < 0 || dst > numVertex) { 
+				throw invalid_argument{ "index out of bound" };
+			}
 			adjList[src].emplace_back(dst, w);				
 			numEdge++;
 		}
@@ -36,7 +38,6 @@ class Graph_List : public Graph {
 			}	
 		}
 
-		void setAdjList(vector<vector<pair<int, int>>>& l) { adjList = l; }
 		const vector<vector<pair<int, int>>>& getAdjList() const { return adjList; }
 
 	private:
@@ -45,16 +46,18 @@ class Graph_List : public Graph {
 
 class Graph_Matrix : public Graph {
 	public: 
-		Graph_Matrix(int v, int e) : Graph(v, e), adjMatrix(v, vector<int>(v, INT_MAX)) {}
-		Graph_Matrix() : Graph(0, 0), adjMatrix{0} {}
+		Graph_Matrix(int v, int e, vector<vector<int>>& M) : Graph{ v, e }, adjMatrix{ M } {}
+		Graph_Matrix() : Graph{0, 0}, adjMatrix{0} {}
 
 		void setNumVertex(int v) { 
 			numVertex = v; 
 			adjMatrix.resize(v, vector<int>(v, INT_MAX)); 
 		}
 		void addEdge(int src, int dst, int w) {
-			if (w < 0) {cout << "weight must be positive" << endl; return; }
-			if (src < 0 || src > numVertex || dst < 0 || dst > numVertex) { cout << "index out of bound" << endl; return; }
+			if (w < 0) { throw invalid_argument{ "weight must be positive" }; }
+			if (src < 0 || src > numVertex || dst < 0 || dst > numVertex) { 
+				throw invalid_argument{ "index out of bound" };
+			}
 			adjMatrix[src][dst] = w;
 			numEdge++;
 		}
@@ -68,8 +71,6 @@ class Graph_Matrix : public Graph {
 				cout << endl;
 			}
 		}
-
-		void setAdjMatrix(vector<vector<int>>& m) { adjMatrix = m; }
 		const vector<vector<int>>& getAdjMatrix(void) const { return adjMatrix; }
 
 	private:

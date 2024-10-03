@@ -13,8 +13,6 @@ int main() {
 	a.addEdge(1, 4, 30);
 	a.addEdge(2, 3, 20);
 	a.addEdge(3, 5, 10);
-	a.addEdge(3, 4, -1);
-	a.addEdge(6, 5, 10);
 	a.print();
 	cout << "number of vertex " << a.getNumVertex() << endl;
 	cout << "number of edges " << a.getNumEdge() << endl;
@@ -28,8 +26,6 @@ int main() {
 	b.addEdge(1, 4, 30);
 	b.addEdge(2, 3, 20);
 	b.addEdge(3, 5, 10);
-	b.addEdge(3, 4, -1);
-	b.addEdge(6, 5, 10);
 	b.print();
 	cout << "number of vertex " << b.getNumVertex() << endl;
 	cout << "number of edges " << b.getNumEdge() << endl;
