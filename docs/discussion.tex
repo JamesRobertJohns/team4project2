@@ -1,5 +1,8 @@
-\documentclass{beamer}
+\documentclass[a4paper]{beamer}
 \usetheme{CambridgeUS}
+\usepackage{algorithm,algpseudocode}
+\usepackage{lmodern}
+
 \title{SC2001 Project 2}
 \subtitle{The Dijkstra's Algorithm}
 \author[Hong, Dinh, He]{Hong Jia Yang \and Dinh Pham Minh Anh \and He Qi Xin}
@@ -92,13 +95,131 @@
 		\begin{itemize}
 			\item \texttt{std::vector} is a sequence container that encapsulates dynamic size arrays
 			\item 0 indexed
-			\item \texttt{INT\_MAX} to represent infinity
+			\item \texttt{std::numeric\_limits<int>::max()} to represent infinity
 		\end{itemize}
 		\item Random access: \( O(1) \) 
 		\item Insertion or removal of elements at the end: \emph{amortised} \( O(1) \) 
 		\item Insertion or removal of elements: \( O(n) \) 
 		\item Search whether \( (u,v) \in E \): \( O(1) \) 
 		\item Space Complexity: \( O(V^2) \) 
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Overview of Priority Queue}
+	A priority queue is a data structure for maintaining a set \( S \) of elements, each with an associated value called key. The min-priority queue should support the following operations
+	\begin{itemize}
+		\item \texttt{INSERT(S, x)} inserts the element \( x \) into the set \( S \)\\
+			\( S \leftarrow S \cup \{x\} \) 
+		\item \texttt{MINIMUM(S)} returns the element of $S$ with the smallest key
+		\item \texttt{EXTRACT-MIN(S)} removes and return the element of \( S \) with the smallest key
+		\item \texttt{DECREASE-KEY(S, x, k)} decreases the value of element \( x \)'s key to new value \( k \), which must be at least as small as \( x \)'s current key value
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Naive Array Implementation} 
+	\begin{columns}
+	\column{0.5\textwidth}		
+	\begin{itemize}
+		\item Unsorted Array
+		\begin{itemize}
+			\item Insertion Time: \( O(1) \) 			
+			\item Key Update Time: \( O(1) \) 
+			\item Peek Time: \( O(n) \) 
+			\item Extract Time: \( O(n) \) 
+			\item Space: \( O(n) \) 
+		\end{itemize}
+	\end{itemize}
+	
+	\column{0.5\textwidth}
+	\begin{itemize}
+		\item Sorted Array
+		\begin{itemize}
+			\item Insertion Time: \( O(n) \) 
+			\item Key Update Time: \( O(n) \) 
+			\item Peek Time: \( O(1) \) 
+			\item Extract Time: \( O(1) \) 
+			\item Space: \( O(n) \) 
+		\end{itemize}
+	\end{itemize}
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Sorted Array}
+	\begin{algorithm}[H]
+		\caption{peek at the minimum node}
+		\begin{algorithmic}[1]
+		\Function{minimum}{$S$}
+			\State \Return $S[0]$
+		\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+
+	\begin{algorithm}[H]
+		\caption{extract the minimum node}
+		\begin{algorithmic}[1]
+		\Function{extract-min}{$S$}
+		\State min \( \leftarrow S[0]\) 
+		\State delete $S[0]$
+		\State \Return min
+		\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+\begin{algorithm}[H]
+		\caption{insert node with index $i$ with weight $k$}
+		\begin{algorithmic}[1]
+		\Function{insert}{$i, k$} 
+			\If{$S$ is empty}
+			\State append \( (i,k) \)  
+			\Else
+			\While{not end of $S$}
+			\If{ \( k_i < k_s\)}
+			\State insert \( (i,k) \) in front of \( (s,k_s) \) 
+			\State \Return
+			\EndIf
+			\EndWhile
+			\State append \( (i,k) \) 
+			\EndIf
+		\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+		\caption{decrease node at index \( i \) to key \( k \)}
+		\begin{algorithmic}[1]
+			\Function{decrease-key}{$i,k$}
+			\If{$k$ is bigger than original value}
+			\State throw error
+			\Else
+			\State \( (i, k_0) \leftarrow (i, k_1) \)  
+			\While{not at start of \( S \) and \( k \) is less than previous}
+			\State swap \( (i_0, k_0) \) with \( (i_{-1}, k_{-1}) \) 
+			\EndWhile
+			\EndIf
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Implementation in C++}
+	\begin{itemize}
+		\item Use \texttt{std::vector<std::pair<int, int>>} to represent the array of pairs
+		\item Use \texttt{std::iterator} to traverse the array 
+		\begin{itemize}
+			\item Iterators are a generalization of pointers that allow a C++ program to work with different data structures
+		\end{itemize}
+		\item Use \texttt{std::itr\_swap} to swap the \texttt{iterators} 
+		\begin{itemize}
+			\item Swaps the values of the elements the given iterators are pointing to.
+		\end{itemize}	
 	\end{itemize}
 \end{frame}
 
