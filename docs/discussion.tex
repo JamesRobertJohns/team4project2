@@ -1,7 +1,7 @@
-\documentclass[a4paper]{beamer}
+\documentclass{beamer}
 \usetheme{CambridgeUS}
 \usepackage{algorithm,algpseudocode}
-\usepackage{lmodern}
+\usepackage{lmodern, mathtools}
 
 \title{SC2001 Project 2}
 \subtitle{The Dijkstra's Algorithm}
@@ -36,6 +36,9 @@
 			\item Processor: Intel(R) Core(TM) i7-10750H (12) @ 2.59 GHz
 		\end{itemize}	
 	\end{itemize}
+	\begin{block}{Note}
+		Please refer to \texttt{JamesRobertJohns/team4project2}
+	\end{block}
 \end{frame}
 
 \section{Implementation of Dijkstra's}
@@ -264,16 +267,205 @@
 			\item \texttt{vector[u]} is the list for \( u \in V \) 
 			\item \texttt{vector[u][i].first} is the index of \( v_i \in V, (u, v_i) \in E \) 
 			\item \texttt{vector[u][i].second} is the weight \( w(u, v_i) \) 	
-			\item 0 indexed
+			\item 0 indexed (\emph{yes, I know. Don't ask.})
 		\end{itemize}
 		\item Search whether \( (u, v) \in E \): \( O(E) \)  
 		\item Space Complexity: \( O(V+E) \) 
 	\end{itemize}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Heap based Priority Queue}
+	There are many kinds of heap implementation, such as
+	\begin{itemize}
+		\item Binary Heap
+		\item Fibonacci Heap
+		\item d-ary Heap
+		\item Radix Heap
+	\end{itemize}
+	And many more. \newline
+
+	We shall implement \textbf{Binary Heap} 
+\end{frame}
+
+\begin{frame}
+	\frametitle{Binary-Heap}
+	Because of the problem specifications, we \emph{do not} concern ourselves with \textbf{construction} of heap using \texttt{BUILD-MIN-HEAP()}. Instead, the heap is \emph{maintained} through each insertion.
+	\begin{itemize}
+		\item \texttt{peek()}: \( O(1) \) 
+		\item \texttt{extract()}: \( O(\lg{n}) \) 
+		\item \texttt{decreaseKey()}: \( O(\lg{n}) \) 
+		\item \texttt{insert()}: \( O(\lg{n}) \) 
+		
+	\end{itemize}
+
+	\onslide<2>\begin{block}{Note}
+		For heap data structure to work, we \emph{must} index from 1.	
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+		\caption{get index \( i \)'s parent's index}
+		\begin{algorithmic}[1]
+			\Function{parent}{$i$}
+			\State \Return \( \lfloor \frac{ i }{ 2 }  \rfloor \) 
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}	
+
+	\begin{algorithm}[H]
+		\caption{get index \( i \)'s left child's index}
+		\begin{algorithmic}[1]
+			\Function{left}{$i$}
+			\State \Return \( 2i \)  
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}	
+
+	\begin{algorithm}[H]
+		\caption{get index \( i \)'s right child's index}
+		\begin{algorithmic}[1]
+			\Function{right}{$i$}
+			\State \Return \( 2i+1 \)  
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}	
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+		\caption{min-heapify the array}
+		\begin{algorithmic}[1]
+			\Function{min-heapify}{$A, i$}
+			\State \(l \gets \) \Call{left}{$i$}
+			\State \( r \gets \) \Call{right}{$i$}
+			\State \( smallest \gets i \) 
+			\If{\( l \leq heapSize[A] \)}
+			\State \( smallest \gets \) \Call{index-of-min}{$A[i], A[l]$}
+			\EndIf
+			\If{\( r \leq heapSize[A]\)}
+			\State \( smallest \gets \) \Call{index-of-min}{$A[smallest], A[r]$}
+			\EndIf
+			\If{ \( smallest \neq i \)}
+			\State \( A[i] \xleftrightarrow{} A[smallest] \)
+			\State \Call{min-heapify}{$A, smallest$}
+			\EndIf
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{Priority Queue Using Binary Heap}
+	\begin{algorithm}[H]
+		\caption{Extract the minimum vertex}
+		\begin{algorithmic}[1]
+			\Function{heap-extract-min}{$A$}
+			\If{\Call{isEmpty}{$A$}}
+			\State throw \textbf{error}  
+			\EndIf
+			\State \( min \gets A[1] \) 
+			\State \( A[1] \gets A[heapSize[A]]\) 
+			\State \( heapSize[A] \gets heapSize[A]-1\) 
+			\State \Call{min-heapify}{$A,1$} 
+			\State \Return \( min \) 
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+		\caption{decrease key value at index $i$ to $k$}
+		\begin{algorithmic}[1]
+			\Function{decrease-key}{$i,k$}
+			\If{ \( k > A[i] \) }
+			\State throw \textbf{error}  
+			\EndIf
+			\State \( A[i] \gets k \) 
+			\While{ \( A[i] < \)  \Call{parent}{$i$} \textbf{AND} \( i > 1 \) }
+			\State \( A[i] \xleftrightarrow{} \) \Call{parent}{$i$}
+			\State \( i \xleftrightarrow{} \) \Call{parent}{$i$}
+			\EndWhile
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+		\caption{insert vertex with index \( i \) with key \( k \)  into the queue}
+		\begin{algorithmic}[1]
+			\Function{insert}{$A,k$}
+			\State \( heapSize[A] \gets heapSize[A]+1 \) 
+			\State \( A[heapSize[A]] \gets \infty\) 
+			\State \Call{decrease-key}{$A, k$}
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Problems}
+	\begin{itemize}
+		\item The heap must be able to support vertex-weight \textbf{pair} 
+		\begin{itemize}
+			\item It is easy to modify the data structure to include the pair
+			\item Key comparison is made on the weight 
+		\end{itemize}
+		\item The index of the vertex-weight pair will be \textbf{shuffled} upon each \texttt{insertion()} and \texttt{extract()} 
+		\begin{itemize}
+			\item To prevent the \emph{loss} of information, we need a way to track their handles
+			\item This is non-trivial
+		\end{itemize}
+	\end{itemize}
+	\onslide<2> \begin{block}{Question}
+		How can we track their handles?
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\begin{columns}
+	\column{0.5\textwidth}
+	\begin{figure}
+		\centering
+		\includegraphics[scale=0.5]{./pict/secret1.png}
+	\end{figure}
+
+	\column{0.5\textwidth}
+	\onslide<2>\begin{figure}
+		\centering
+		\includegraphics[scale=0.5]{pict/secret2.jpg}
+		\caption{ \emph{A man and his hash map, 2024} }
+	\end{figure}	
+	\end{columns}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Implementation in C++}				
+	\begin{itemize}
+		\item To augment the pair, use \texttt{std::vector<pair<int, int>>} 
+		\begin{itemize}
+			\item \emph{Love \texttt{C++} yet?}
+		\end{itemize}
+		\item To track the handles, use \texttt{std::unordered\_map<int, int>} 
+		\begin{itemize}
+			\item \texttt{std::unordered\_map} is an associative container that contains key-value pairs with unique keys. 
+			\item Search, insertion, and removal of elements have average constant-time complexity.
+			\item Internally, the elements are not sorted in any particular order, but organized into buckets. 
+			\item Which bucket an element is placed into depends entirely on the hash of its key.
+			\item The key-value pair will be (vertex index, index in queue)
+		\end{itemize}
+	\end{itemize}
+	\onslide<2>\begin{block}{note}
+		Please refer to \texttt{JamesRobertJohns/team4projet2} 	
+	\end{block}
+\end{frame}
+
 \section{Complexity Analysis and Comparison}
 \begin{frame}
-	
+
 \end{frame}
 
 \end{document}
