@@ -3,6 +3,35 @@
 using namespace std;
 #include "project2.hpp"
 
+template <typename T>
+void TEST_PQ(T pq) {
+	cout << "=================" << endl;
+
+	cout << "print():" << endl;
+	pq.print();
+
+	cout << "insert(): (1, 10), (7, 20), (2, 5), (13, 1), (5, 15) " << endl;
+	pq.insert(make_pair(1, 10));
+	pq.insert(make_pair(7, 20));
+	pq.insert(make_pair(2, 5));
+	pq.insert(make_pair(13, 1));
+	pq.insert(make_pair(5, 15));
+	cout << "queue is: ";
+	pq.print();	
+
+	cout << "peek():" << pq.peek() << endl;
+	
+	cout << "extract(): " << pq.extract() << endl;	
+	cout << "queue is: ";
+	pq.print();
+
+	cout << "decreaseKey(7, 0): ";
+	pq.decreaseKey(7, 0);
+	cout << "queue is: ";
+	pq.print();
+	cout << "=================" << endl;
+}
+
 int main() {
 	Graph_List a{};
 	a.setNumVertex(5);
@@ -30,14 +59,14 @@ int main() {
 	cout << "number of vertex " << b.getNumVertex() << endl;
 	cout << "number of edges " << b.getNumEdge() << endl;
 
+	cout << "pqa test" << endl;
 	PriorityQ_Array pqa{};
-	pqa.print();
-	pqa.insert(make_pair(1, 10));
-	pqa.insert(make_pair(2, 5));
-	pqa.insert(make_pair(3, 20));
-	pqa.insert(make_pair(4, 1));
-	pqa.insert(make_pair(5, 15));
-	pqa.print();	
-	pqa.decreaseKey(3, 2);
-	pqa.print();
+	TEST_PQ(pqa);	
+
+	cout << "pqh test" << endl;
+	PriorityQ_Heap pqh{};
+	TEST_PQ(pqh);	
+	
 }
+
+
