@@ -127,11 +127,11 @@
 	\begin{itemize}
 		\item Unsorted Array
 		\begin{itemize}
-			\item Insertion Time: \( O(1) \) 			
-			\item Key Update Time: \( O(1) \) 
-			\item Peek Time: \( O(n) \) 
-			\item Extract Time: \( O(n) \) 
-			\item Space: \( O(n) \) 
+			\item Insertion Time: \( \mathcal{O}(1) \) 			
+			\item Key Update Time: \( \mathcal{O}(1) \) 
+			\item Peek Time: \( \mathcal{O}(V) \) 
+			\item Extract Time: \( \mathcal{O}(V) \) 
+			\item Space: \( \mathcal{O}(V) \) 
 		\end{itemize}
 	\end{itemize}
 	
@@ -139,11 +139,11 @@
 	\begin{itemize}
 		\item Sorted Array
 		\begin{itemize}
-			\item Insertion Time: \( O(n) \) 
-			\item Key Update Time: \( O(n) \) 
-			\item Peek Time: \( O(1) \) 
-			\item Extract Time: \( O(1) \) 
-			\item Space: \( O(n) \) 
+			\item Insertion Time: \( \mathcal{O}(V) \) 
+			\item Key Update Time: \( \mathcal{O}(V) \) 
+			\item Peek Time: \( \mathcal{O}(1) \) 
+			\item Extract Time: \( \mathcal{O}(1) \) 
+			\item Space: \( \mathcal{O}(V) \) 
 		\end{itemize}
 	\end{itemize}
 	\end{columns}
@@ -226,6 +226,83 @@
 	\end{itemize}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Overview of Dijkstra's}
+	Dijkstra's algorithm solves the single-source shortest-path problem on a \textbf{weighted, directed} graph \( G = (V, E) \) for the case in which all edge weights are \textbf{non-negative}.\newline
+
+	The algorithm maintains  a set \( S \) of vertices whose final shortest-path weights from the source \( s \) has been already determined. \newline
+
+	It repeatedly selects the vertex \( u \in V - S \) with the minimum shortest-path estimate, adds \( u \) to \( s \), and relaxes all edges leaving \( u \) 
+\end{frame}
+
+\begin{frame}
+\begin{algorithm}[H]
+		\caption{Initialisation}
+		\begin{algorithmic}[1]
+			\Function{initialise-single-source}{$G,s$}
+			\For{each vertex \( v \in V[G] \)}
+			\State \( d[v] \gets \infty \) 
+			\State \( \pi[v] \gets \phi \) 
+			\EndFor
+			\State \( d[s] \gets 0 \) 
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+		\caption{Relaxation of edge}
+		\begin{algorithmic}[1]
+			\Function{relax}{$u,v,w$}
+			\If{ \( d[v] > d[u] + w(u, v) \) }
+				\State \( d[v] \gets d[u] + w(u,v) \) 
+				\State \( \pi[v] \gets u \) 
+			\EndIf
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+		\caption{Dijsktra's Algorithm}
+		\begin{algorithmic}[1]
+			\Function{dijkstra}{$G,w,s$}
+			\State \Call{initialise-single-source}{$G,s$}
+			\State \( S \gets \phi \) 	
+			\State \( Q \gets V[G] \) 
+			\While{ \( Q \neq \phi \) }
+				\State \( u \gets \) \Call{extract}{$Q$}
+				\State \( S \gets S \cup \{u\} \) 
+				\For{ each vertex \( v \in Adj[u] \) }
+					\State \Call{relax}{$u, v, w$}
+				\EndFor
+			\EndWhile
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+\begin{frame}
+	\begin{algorithm}[H]
+		\caption{Print the shortest path from $s$ to $v$}
+		\begin{algorithmic}[1]
+			\Function{print-path}{$G,s,v$}
+				\If{\( v = s \)}
+				\State print \( s \) 
+				\ElsIf{$\pi[v] = \phi$}
+				\State print "no path from \( s \) to \( v \) exists"
+				\Else 
+				\State \Call{print-path}{$G,s,\pi[v]$}
+				\State print \( v \) 
+				\EndIf
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+\end{frame}
+
+
 \subsection{Adjacency List and Minimising Heap}
 \begin{frame}
 	\frametitle{List Representation of Graph}	
@@ -296,7 +373,6 @@
 		\item \texttt{extract()}: \( O(\lg{n}) \) 
 		\item \texttt{decreaseKey()}: \( O(\lg{n}) \) 
 		\item \texttt{insert()}: \( O(\lg{n}) \) 
-		
 	\end{itemize}
 
 	\onslide<2>\begin{block}{Note}
