@@ -156,16 +156,18 @@ class PriorityQ_Heap : public PriorityQ {
 		pair<int, int> extract() override { 
 			int min = peek();	   
 			pair<int, int> node = getA()[0];
-			auto it = m.find(A[0].first); m.erase(it);
+			// auto it = m.find(A[0].first); 	
+			// m.erase(it);
 			A[0] = A[heapSize-1];
 			heapSize--;
 			minHeapify(1);
+			updateM();
 			return node;
 		}
 		void swapPairByIndex(int pair_A, int pair_B) {
-			int t1 = A[pair_A].first; int t2 = A[pair_A].second; int t3 = m[t1];
-			m[A[pair_A].first] = m[A[pair_B].first];
-			m[A[pair_B].first] = t3;
+			int t1 = A[pair_A].first; int t2 = A[pair_A].second; // int t3 = m[t1];
+			// m[A[pair_A].first] = m[A[pair_B].first];
+			// m[A[pair_B].first] = t3;
 			A[pair_A].first = A[pair_B].first; 
 			A[pair_A].second = A[pair_B].second;
 			A[pair_B].first = t1;
@@ -173,12 +175,15 @@ class PriorityQ_Heap : public PriorityQ {
 		}
 		void decreaseKey(int vertex, int key) override { 
 			int index = m[vertex];	
-			if (A[index].second < key) throw invalid_argument{ "[-] in decreaseKey(): key needs to be at least as small" };
+			cout << "in decrease key: vertex is " << vertex << ", index in queue is : " << index << endl;
+			if (A[index].second < key) throw invalid_argument{ "[-] in decreaseKey(): key needs to be at least as small. current vertex is: " + to_string(index) + " current key is: " + to_string(A[index].second) + " new key trying to assign is: " + to_string(key) };
 			A[index].second = key;
 			while (A[index].second < A[PARENT(index+1)-1].second && index > 0) {
 				swapPairByIndex(index, (PARENT(index+1)-1));	
 				index = PARENT(index+1) - 1;
 			}
+
+			updateM();
 		} 
 
 		void insert(pair<int,int> node) override {
@@ -217,6 +222,22 @@ class PriorityQ_Heap : public PriorityQ {
 			cout << endl;
 		}
 
+		unordered_map<int, int>& getM() { return m; }
+
+		void print_heap() {
+			for (int i = 0; i < heapSize; i++) {
+				cout << "( " << A[i].first << ", " << A[i].second << ") ";
+			}
+			cout << endl;
+		}
+
+		void updateM() {
+			m.clear();
+			for (int i = 0; i < heapSize; i++) {
+				m[A[i].first] = i;
+			}				
+		}
+
 	private:
 		size_t heapSize;
 		unordered_map<int, int> m;
@@ -237,14 +258,15 @@ class Dijkstra {
 			S[s] = 1;
 		}	
 
-		void relax(int u, int v, int w, PriorityQ& Q) {
+		void relax(int u, int v, int w, PriorityQ& q) {
 			if (d[v] > d[u] + w) {
 				d[v] = d[u] + w;
 				pi[v] = u;
-				Q.decreaseKey(v, d[v]);
+				q.decreaseKey(v, d[v]);
 			}
 		}
 
+		
 		void print_path(int s, int v) {
 			if (v == s) 
 				cout << s << " ";
@@ -325,6 +347,60 @@ class Dijkstra_1 : public Dijkstra {
 				print_pi();
 		}
 };
+
+
+// Graph: adjacency list; Priority Queue: Minimizing Heap
+
+class Dijkstra_2 : public Dijkstra {
+	public: 
+		Dijkstra_2() : Dijkstra() {}
+
+		void findPath(Graph_List g, int s) {
+			init(g, s);
+			
+			cout << "initialised" << endl;
+			print_d();
+			print_pi();	
+
+			PriorityQ_Heap Q{};
+		
+			for (int i = 0; i < d.size(); i++) {
+				Q.insert(make_pair(i, d[i]));
+			}
+
+			Q.print_heap();
+			Q.print_map();
+
+			while (!Q.isEmpty()) {
+				pair<int, int> node = Q.extract();
+				int u = node.first;
+				S[u] = 1;
+				d[u] = node.second;
+				for (const auto& i : g.getAdjList()[u]) {
+					if (S[i.first] == 0) {
+						relax(u, i.first, i.second, Q); 
+						cout << "After Relaxation between vertex " << u << " and " << i.first << endl;
+						cout << "W: " << i.second + d[u] << endl;
+						print_d();
+						print_pi();
+						cout << "Queue: ";
+						Q.print_heap();
+						cout << endl;
+						Q.print_map();
+						cout << "====================" << endl;
+					}
+				}
+			}
+			cout << endl;
+			cout << "==[ final ]==" << endl;	
+			cout << "Queue" << endl;
+			Q.print_heap();
+			print_S();
+			print_d();
+			print_pi();
+	}
+};
+
 
 
 #endif // PROJECT2_HPP 
