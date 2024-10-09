@@ -3,7 +3,7 @@ import random
 
 random.seed(42)
 NUM_VERTEX = 250
-MAX_EDGES = 500
+MAX_EDGES = 1000
 INTERVAL = 100
 START_EDGES = 100
 MAX_WEIGHT = 1000
