@@ -1,6 +1,6 @@
 #ifndef PROJECT2_HPP
 #define PROJECT2_HPP
-
+using ii = std::pair<int, int>;
 class Graph {
 	public:
 		Graph(int v, int e) : numVertex{ v }, numEdge{ e } {}
@@ -148,6 +148,79 @@ class PriorityQ_Array : public PriorityQ {
 };
 
 
+class PriorityQ_Heap2 : public PriorityQ {
+	public:
+		PriorityQ_Heap2() : PriorityQ{}, heapSize{ 0 } {}
+
+		bool isEmpty() override { return heapSize==0? true:false; }
+		pair<int, int> extract() override { 
+			int min = peek();	   
+			pair<int, int> node = getA()[0];
+			A[0] = A[heapSize-1];
+			heapSize--;
+			minHeapify(1);
+			return node;
+		}
+		void swapPairByIndex(int pair_A, int pair_B) {
+			int t1 = A[pair_A].first; int t2 = A[pair_A].second; 
+			A[pair_A].first = A[pair_B].first; 
+			A[pair_A].second = A[pair_B].second;
+			A[pair_B].first = t1;
+			A[pair_B].second = t2;
+		}
+		void decreaseKey(int vertex, int key) override { 
+			int index = m[vertex];	
+			if (A[index].second < key) throw invalid_argument{ "[-] in decreaseKey(): key needs to be at least as small. current vertex is: " + to_string(index) + " current key is: " + to_string(A[index].second) + " new key trying to assign is: " + to_string(key) };
+			A[index].second = key;
+			while (A[index].second < A[PARENT(index+1)-1].second && index > 0) {
+				swapPairByIndex(index, (PARENT(index+1)-1));	
+				index = PARENT(index+1) - 1;
+			}
+		} 
+
+		void insert(pair<int,int> node) override {
+			if (isEmpty()) { 
+				A.push_back(node);	
+				m[node.first] = 0;
+				heapSize++;
+			}
+			else {
+				heapSize++;
+				A.push_back(node);
+				A[heapSize-1].second = numeric_limits<int>::max();
+				m[node.first] = heapSize-1;
+				decreaseKey(node.first, node.second); 
+			}
+		}
+
+		int PARENT(int i) const { return i/2; }
+		int LEFT(int i) const { return 2*i; }
+		int RIGHT(int i) const { return 2*i + 1; }
+
+		void minHeapify(int i) {
+			int l = LEFT(i); int r = RIGHT(i); int smallest = i;
+			if (l <= heapSize && A[l-1].second < A[i-1].second) { smallest = l; }	
+			if (r <= heapSize && A[r-1].second < A[smallest-1].second) { smallest = r; }
+			if (smallest != i) {
+				swapPairByIndex(i-1, smallest-1);
+				minHeapify(smallest);
+			}
+		}
+		
+		void print_heap() {
+			for (int i = 0; i < heapSize; i++) {
+				cout << "( " << A[i].first << ", " << A[i].second << ") ";
+			}
+			cout << endl;
+		}
+
+	private:
+		size_t heapSize;
+		unordered_map<int, int> m;
+};
+
+
+
 class PriorityQ_Heap : public PriorityQ {
 	public:
 		PriorityQ_Heap() : PriorityQ{}, heapSize{ 0 } {}
@@ -175,7 +248,6 @@ class PriorityQ_Heap : public PriorityQ {
 		}
 		void decreaseKey(int vertex, int key) override { 
 			int index = m[vertex];	
-			cout << "in decrease key: vertex is " << vertex << ", index in queue is : " << index << endl;
 			if (A[index].second < key) throw invalid_argument{ "[-] in decreaseKey(): key needs to be at least as small. current vertex is: " + to_string(index) + " current key is: " + to_string(A[index].second) + " new key trying to assign is: " + to_string(key) };
 			A[index].second = key;
 			while (A[index].second < A[PARENT(index+1)-1].second && index > 0) {
@@ -248,7 +320,7 @@ class Dijkstra {
 	public:
 		Dijkstra() {}
 
-		void init(Graph g, int s) {
+		void init(Graph& g, int s) {
 			for (int v = 0; v < g.getNumVertex(); v++) {
 				d.push_back(numeric_limits<int>::max());
 				pi.push_back(-1);
@@ -266,7 +338,6 @@ class Dijkstra {
 			}
 		}
 
-		
 		void print_path(int s, int v) {
 			if (v == s) 
 				cout << s << " ";
@@ -308,7 +379,7 @@ class Dijkstra_1 : public Dijkstra {
 	public: 
 		Dijkstra_1() : Dijkstra() {}
 
-		void findPath(Graph_Matrix g, int s) {
+		void findPath(Graph_Matrix& g, int s) {
 			init(g, s);
 			PriorityQ_Array Q{};
 			for (int v = 0; v < g.getNumVertex(); v++) {
@@ -324,27 +395,10 @@ class Dijkstra_1 : public Dijkstra {
 				S[u] = 1;
 				d[u] = node.second;
 				for (int v = 0;  v < g.getNumVertex(); v++) {
-					if (g.getAdjMatrix()[u][v] != numeric_limits<int>::max() && S[v] == 0) {
+					if (g.getAdjMatrix()[u][v] != numeric_limits<int>::max() && S[v] == 0) 
 								relax(u, v, g.getAdjMatrix()[u][v], Q); 
-								cout << endl;
-								cout << "After Relaxation between vertex " << u << " and " << v << endl;
-								cout << "W: " << g.getAdjMatrix()[u][v] << endl;
-								print_d();
-								print_pi();
-								cout << "Queue: ";
-								Q.print();
-								cout << endl;
-						}
 					}	
 				}
-				
-				cout << endl;
-				cout << "==[ final ]==" << endl;	
-				cout << "Queue" << endl;
-				Q.print();
-				print_S();
-				print_d();
-				print_pi();
 		}
 };
 
@@ -355,21 +409,13 @@ class Dijkstra_2 : public Dijkstra {
 	public: 
 		Dijkstra_2() : Dijkstra() {}
 
-		void findPath(Graph_List g, int s) {
+		void findPath(Graph_List& g, int s) {
 			init(g, s);
-			
-			cout << "initialised" << endl;
-			print_d();
-			print_pi();	
-
 			PriorityQ_Heap Q{};
 		
 			for (int i = 0; i < d.size(); i++) {
 				Q.insert(make_pair(i, d[i]));
 			}
-
-			Q.print_heap();
-			Q.print_map();
 
 			while (!Q.isEmpty()) {
 				pair<int, int> node = Q.extract();
@@ -377,29 +423,137 @@ class Dijkstra_2 : public Dijkstra {
 				S[u] = 1;
 				d[u] = node.second;
 				for (const auto& i : g.getAdjList()[u]) {
-					if (S[i.first] == 0) {
+					if (S[i.first] == 0) 
 						relax(u, i.first, i.second, Q); 
-						cout << "After Relaxation between vertex " << u << " and " << i.first << endl;
-						cout << "W: " << i.second + d[u] << endl;
-						print_d();
-						print_pi();
-						cout << "Queue: ";
-						Q.print_heap();
-						cout << endl;
-						Q.print_map();
-						cout << "====================" << endl;
-					}
 				}
 			}
-			cout << endl;
-			cout << "==[ final ]==" << endl;	
-			cout << "Queue" << endl;
-			Q.print_heap();
-			print_S();
-			print_d();
-			print_pi();
-	}
+			
+		}
 };
+
+// optimise
+class Dijkstra_3 : public Dijkstra {
+	public: 
+		Dijkstra_3() : Dijkstra() {}
+
+		void findPath(Graph_List& g, int s) {
+			vector<int> dist(g.getNumVertex(), pow(10, 9)); dist[s] = 0; 
+			priority_queue<ii, vector<ii>, greater<ii> > pq; pq.push(ii(0, s)); 	
+			for (int i = 0; i < g.getNumVertex(); i++) { pi.push_back(-1); }
+			
+			while (!pq.empty()) {
+					ii top = pq.top(); pq.pop();		
+					int d = top.first, u = top.second;
+					if (d == dist[u]) {
+						for (const auto& i : g.getAdjList()[u]) {
+							int v = i.first; int weight_u_v = i.second;		
+							if (dist[u] + weight_u_v < dist[v]) {
+								dist[v] = dist[u] + weight_u_v;
+								pq.push(ii(dist[v], v));
+								pi[v] = u;
+							}
+						}
+					}
+			}
+		}
+};
+
+
+void logger(string path_input, string path_output, Graph_Matrix G, Dijkstra_1 algo) {
+	ifstream input; 
+	ofstream output;
+	input.open(path_input);
+	output.open(path_output, ios::app);
+
+	if (!input || !output) {throw std::runtime_error{"[-] In logger(): Error in opening files"}; }
+	
+	int num_vertex;
+	input >> num_vertex;
+	G.setNumVertex(num_vertex);
+	
+	int source, destination, weight;
+    while (input >> source >> destination >> weight) { 
+        G.addEdge(source, destination, weight); 
+    }
+
+	istream_iterator<int> start(input), end;
+		
+	const auto t1 = chrono::high_resolution_clock::now();
+	algo.findPath(G, 0);
+	const auto t2 = chrono::high_resolution_clock::now();
+	chrono::duration<double, std::milli> ms_double = t2 - t1;
+
+	output 	<< G.getNumVertex() << ", "
+			<< G.getNumEdge() << ", " 
+			<< ms_double.count() << "\n";	
+
+	input.close();
+	output.close();
+}
+
+void logger(string path_input, string path_output, Graph_List G, Dijkstra_2 algo) {
+	ifstream input; 
+	ofstream output;
+	input.open(path_input);
+	output.open(path_output, ios::app);
+
+	if (!input || !output) {throw std::runtime_error{"[-] In logger(): Error in opening files"}; }
+	
+	int num_vertex;
+	input >> num_vertex;
+	G.setNumVertex(num_vertex);
+	
+	int source, destination, weight;
+    while (input >> source >> destination >> weight) { 
+        G.addEdge(source, destination, weight); 
+    }
+
+	istream_iterator<int> start(input), end;
+		
+	const auto t1 = chrono::high_resolution_clock::now();
+	algo.findPath(G, 0);
+	const auto t2 = chrono::high_resolution_clock::now();
+	chrono::duration<double, std::milli> ms_double = t2 - t1;
+
+	output 	<< G.getNumVertex() << ", "
+			<< G.getNumEdge() << ", " 
+			<< ms_double.count() << "\n";	
+
+	input.close();
+	output.close();
+}
+
+void logger(string path_input, string path_output, Graph_List G, Dijkstra_3 algo) {
+	ifstream input; 
+	ofstream output;
+	input.open(path_input);
+	output.open(path_output, ios::app);
+
+	if (!input || !output) {throw std::runtime_error{"[-] In logger(): Error in opening files"}; }
+	
+	int num_vertex;
+	input >> num_vertex;
+	G.setNumVertex(num_vertex);
+	
+	int source, destination, weight;
+    while (input >> source >> destination >> weight) { 
+        G.addEdge(source, destination, weight); 
+    }
+
+	istream_iterator<int> start(input), end;
+		
+	const auto t1 = chrono::high_resolution_clock::now();
+	algo.findPath(G, 0);
+	const auto t2 = chrono::high_resolution_clock::now();
+	chrono::duration<double, std::milli> ms_double = t2 - t1;
+
+	output 	<< G.getNumVertex() << ", "
+			<< G.getNumEdge() << ", " 
+			<< ms_double.count() << "\n";	
+
+	input.close();
+	output.close();
+}
 
 
 

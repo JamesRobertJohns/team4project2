@@ -47,55 +47,6 @@ void TEST_PQ(T pq) {
 }
 
 int main() {
-	/* Graph_List a{};
-	a.setNumVertex(5);
-	a.addEdge(0, 1, 10);
-	a.addEdge(0, 2, 20);
-	a.addEdge(1, 2, 10);
-	a.addEdge(2, 1, 10);
-	a.addEdge(1, 4, 30);
-	a.addEdge(2, 3, 20);
-	a.addEdge(3, 5, 10);
-	a.print();
-	cout << "number of vertex " << a.getNumVertex() << endl;
-	cout << "number of edges " << a.getNumEdge() << endl; */
-
-	/* Graph_Matrix b{};
-	b.setNumVertex(6);
-	b.addEdge(0, 1, 10);
-	b.addEdge(0, 2, 20);
-	b.addEdge(1, 2, 10);
-	b.addEdge(2, 1, 10);
-	b.addEdge(1, 4, 30);
-	b.addEdge(2, 3, 20);
-	b.addEdge(3, 5, 10);
-	b.print(); */
-
-	/* cout << "pqa test" << endl;
-	PriorityQ_Array pqa{};
-	TEST_PQ(pqa);	
-
-	cout << "pqh test" << endl;
-	PriorityQ_Heap pqh{};
-	TEST_PQ(pqh);	*/
-
-	/* Graph_Matrix c{};
-	c.setNumVertex(5); 
-	c.addEdge(0, 1, 10); 
-	c.addEdge(0, 3, 5);
-	c.addEdge(1,2,1);
-	c.addEdge(1,3,2);
-	c.addEdge(3,1,3);
-	c.addEdge(3,2,9);
-	c.addEdge(2,4,4);
-	c.addEdge(3,4,2);
-	c.addEdge(4,0,7);
-	c.addEdge(4,2,6);
-	c.print(); */
-
-	/* PriorityQ_Heap test{};
-	TEST_PQ(test); */
-
 	Graph_List d{}; d.setNumVertex(5);
 	d.addEdge(0, 1, 10);
 	d.addEdge(0, 3, 5);
@@ -109,19 +60,49 @@ int main() {
 	d.addEdge(4,2,6);
 	d.print();
 
-	/* cout << endl;
-	Dijkstra_1 d1{};
-	d1.findPath(c, 0);
-	d1.print_path(0,4);
 	cout << endl;
-	d1.print_path(0, 2); */
-	
-	cout << endl;
-	Dijkstra_2  d2{};
+	Dijkstra_3  d2{};
 	d2.findPath(d, 0);
 	d2.print_path(0, 4);
 	cout << endl;
-	d2.print_path(0, 2);
+	d2.print_path(0, 2); 
+
+	try {
+		int i = 1;
+		string name = "../data/fixed_edges_";
+		while (i <= 10) { 
+			Graph_List G3{};
+			Dijkstra_3 algo3{};
+
+			string appendedName = name + to_string(i) + ".txt";
+			cout << "logging " << appendedName << " now...\n";
+			logger(appendedName, "../data/fixed_edges_output_3.csv", G3, algo3);
+			i++;
+		}
+	} catch(std::exception& e) {
+		cout << e.what() << endl;
+		exit(1);
+	} 
+
+	 try {
+		int i = 1;
+		string name = "../data/fixed_vertex_";
+		while (i <= 10) { 
+			Graph_List G3{};
+			Dijkstra_3 algo3{};
+
+			string appendedName = name + to_string(i) + ".txt";
+			cout << "logging " << appendedName << " now...\n";
+			logger(appendedName, "../data/fixed_vertex_output_3.csv", G3, algo3);
+			i++;
+		}
+	} catch(std::exception& e) {
+		cout << e.what() << endl;
+		exit(1);
+	} 
+
+
+
 }
 
 

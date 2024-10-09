@@ -266,7 +266,7 @@
 
 \begin{frame}
 	\begin{algorithm}[H]
-		\caption{Dijsktra's Algorithm}
+		\caption{Dijkstra's Algorithm}
 		\begin{algorithmic}[1]
 			\Function{dijkstra}{$G,w,s$}
 			\State \Call{initialise-single-source}{$G,s$}
@@ -302,6 +302,36 @@
 	\end{algorithm}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Theoretical Analysis}
+The running time of Dijkstra’s algorithm depends on how the priority queue
+is implemented. \newline 
+
+\begin{itemize}
+	\item Each \texttt{INSERT} and \texttt{DECREASE-KEY} operation takes $O( \lvert{ V }\rvert   )$ time (we maintain a sorted array)
+	\item Each \texttt{EXTRACT-MIN} operation takes $O(1)$ time
+	\item Edge Relaxation takes \( O( \lvert{ E }\rvert   ) \) time
+\end{itemize}
+
+Hence, the time complexity is \( O( \lvert{ V }\rvert^2 + \lvert{ E }\rvert)  \) 
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Empirical Analysis - Fixed Number of Edges}
+	\begin{figure}
+		\centering
+	\includegraphics[width=0.75\textwidth]{pict/Q1_fixedEdges.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Empirical Analysis - Fixed Number of Vertex}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.75\textwidth]{pict/Q1_fixedVertex.png}
+	\end{figure}
+\end{frame}
 
 \subsection{Adjacency List and Minimising Heap}
 \begin{frame}
@@ -539,9 +569,117 @@
 	\end{block}
 \end{frame}
 
-\section{Complexity Analysis and Comparison}
 \begin{frame}
+	\frametitle{Theoretical Analysis}
+The running time of Dijkstra’s algorithm depends on how the priority
+queue is implemented.
+	\begin{itemize}
+		\item Each \texttt{EXTRACT()} takes \( O(\lg \lvert{ V }\rvert ) \) (binary-heap), and there are at most \( \lvert{ V }\rvert  \)  
+		\item Each \texttt{DECREASE-KEY()} takes \( O(\lg \lvert{ V }\rvert)  \), and there are at most \texttt{RELAX()} times, that is, \( \lvert{ E }\rvert  \)  such operations
+	\end{itemize}
+	The time complexity is \( O(( \lvert{ V }\rvert + \lvert{ E }\rvert) \lg{\lvert{V}\rvert})  \)
+	\onslide<2> \begin{block}{note}
+		If all vertices are reachable from the source, then the running time is actually \( O( \lvert{ E }\rvert \lg \lvert{ V }\rvert )  \). However, the generations of inputs is random, hence a path may not exist at all
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Empirical Analysis - Fixed Number of Edges}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.75\textwidth]{pict/Q2_fixedEdges.png}	
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Empirical Analysis - Fixed Number of Vertex}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.75\textwidth]{pict/Q2_fixedVertex.png}	
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{A New Problem}
+	Despite behaving the way we expect it to be in terms of asymptotic time, the absolute time is \emph{worse} than the naive array implementation \newline
+
+	The implementation of hash map proved to be very troublesome since \texttt{DECREASE-KEY()} required swapping of values in the hash map, while each \texttt{EXTRACT()} requires the reduction in indexes for all subsequent positions in the map. To simplify this, the actual implementation had to clear the map and reassign it. \newline
+
+	Regardless of which method used, such implementation introduced \textbf{significant overhead}. We \emph{have} to reject this implementation.
+	\onslide<2> \begin{block}{Lesson}
+		\emph{Do not blindly use hash maps.}
+	\end{block}	
+\end{frame}
+
+\begin{frame}
+	\frametitle{A smart implementation}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.75\textwidth]{pict/secret3.jpg}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{A smart implementation}
+	Steven \& Felix's quick and simple implementation do away with the need for the handles. In fact, they do not even bother with the \texttt{DECREASE-KEY()} at all. \newline
+
+	They propose that even though we want to process vertex $u$ only once,  we can
+	actually enqueue $u$ \emph{several times} in \texttt{priority\_queue} \newline
+
+\emph{"This is because other occurrences of $u$ in priority\_queue will have greater distances (after relaxing) and can be ignored (the overhead is small) :)"}
+	\begin{block}{Note}
+		For more info, refer to their books, particularly CP 4
+	\end{block}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Borrowing their implementation - Fixed Edges}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.75\textwidth]{pict/Q3_fixedEdges.png}
+	\end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Borrowing their implementation - Fixed Vertex}
+	\begin{figure}
+		\centering
+		\includegraphics[width=0.75\textwidth]{pict/Q3_fixedVertex.png}
+	\end{figure}
+\end{frame}
+
+\section{Comparison}
+\begin{frame}
+	\frametitle{Which implementation is better?}
+	Recall the following time complexity from previous 
+	\begin{itemize}
+		\item naive array: \( O( \lvert{ V }\rvert^2 + \lvert{ E }\rvert)  \) 
+		\begin{itemize}
+			\item This is furthur simplified into \( O( \lvert{ V }\rvert^2) \)
+		\end{itemize}
+		\item min-binary-heap: \( O(( \lvert{ V }\rvert + \lvert{ E }\rvert) \lg{\lvert{V}\rvert})  \)
+	\end{itemize}	
+	Intuitively, it seems like the min-binary-heap is better, but when will it perform as \emph{worse} as the naive array? \newline
 
 \end{frame}
+
+\begin{frame}
+	\frametitle{When is the implementation better?}
+
+	This is the same as finding 
+	\[
+		(\lvert{ V }\rvert + \lvert{ E }\rvert)\lg \lvert{ V }\rvert \leq \lvert{ V }\rvert^2 
+	\]
+
+	Particularly, when \( \lvert{ E }\rvert = \frac{ \lvert{ V }\rvert^2 }{ \lg \lvert{ V }\rvert   }    \) , asymptotic time of the min-binary-heap implementation is
+	\[
+		O(\lvert{ V }\rvert^2 + (\lvert{ V }\rvert )\lg \lvert{ V }\rvert)  = O(\lvert{ V }\rvert^2)
+	\]
+
+	\onslide<2> \begin{block}{note}
+		When the number of edges is much less than the number of vertexes, we call such a graph \textbf{sparse}.
+	\end{block}
+\end{frame}
+
 
 \end{document}

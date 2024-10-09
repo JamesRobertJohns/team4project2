@@ -1,0 +1,3 @@
+- Refer to `src/` for implementation details
+- Refer to `data/` for the data extracted
+- Refer to `docs/` for the discussion
